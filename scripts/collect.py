@@ -306,8 +306,8 @@ PTY = {"1": "비", "2": "비/눈", "3": "눈", "4": "소나기"}
 def summarize_day(hours):
     """하루치 시간별 값 → 낮(06~21시) 기준 요약과 오전/오후/밤 슬롯."""
     day = {h: v for h, v in hours.items() if 6 <= int(h[:2]) <= 21}
-    if not day:
-        return None
+    if len(day) < 12:
+        return None  # 저녁 실행 때의 '오늘'처럼 낮 시간이 대부분 지나간 날은 빼기
 
     def nums(cat):
         out = []
@@ -427,7 +427,12 @@ def attach_fishing(camps, points):
             c["fishDays"] = {}
             for d, rs in days.items():
                 top = max(rs, key=lambda r: FISH_LEVEL.get(r["idx"], 0))
-                c["fishDays"][d] = {"idx": top["idx"], "fish": top["fish"], "sea": top["sea"], "tide": top["tide"]}
+                # 지수가 가장 좋은 어종 이름 (기타어종 제외, 최대 2개)
+                fish = []
+                for r in rs:
+                    if r["idx"] == top["idx"] and r["fish"] and r["fish"] != "기타어종" and r["fish"] not in fish:
+                        fish.append(r["fish"])
+                c["fishDays"][d] = {"idx": top["idx"], "fish": "·".join(fish[:2]), "sea": top["sea"], "tide": top["tide"]}
         elif best:
             c["point"] = {"name": None, "km": round(best_d, 1)}
 
