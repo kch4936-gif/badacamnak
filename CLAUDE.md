@@ -33,13 +33,12 @@ README.md             설정 방법(시크릿, Pages, 변수)
 4. 국립해양조사원_바다낚시지수 조회 — `1192136/fcstFishingv2/GetFcstFishingApiServicev2` (포털 Swagger로 확인, 2026-10-04). 필수 `type=json`, `gubun=갯바위|선상`, numOfRows 최대 300, 7일 예측. 응답은 `response` 감싸기 없이 `header/body`가 최상위일 수 있어 call()에서 보정. 필드: seafsPstnNm, lat, lot, predcYmd, predcNoonSeCd(시간), totalIndex, lastScr, seafsTgfshNm, tdlvHrCn(물때), min/maxWtem 등.
 - 게이트웨이 키 오류는 HTTP 403 + `OpenAPI_ServiceResponse` JSON으로 옴 → call()에서 코드 추출.
 
-## 현재 상태 (2026-10-04)
-- 프로젝트 위치: `C:\Users\USER\Desktop\부업프로젝트\badacamnak` (원본 `AI교육\badacamnak` 에서 복사).
-- workflow는 `.github/workflows/update.yml` 로 이동 완료. 바다낚시지수 연결 완료(기본값).
-- 4개 엔드포인트 모두 도달 확인(가짜 키로 NOT_REGISTERED 응답). 실제 키로는 아직 미실행.
-- 이 PC에 git 미설치 → git 설치 또는 GitHub 웹 업로드 필요.
+## 현재 상태 (2026-10-07)
+- 프로젝트 위치: `C:\Users\USER\Desktop\부업프로젝트\badacamnak`. 저장소 https://github.com/kch4936-gif/badacamnak , 사이트 https://kch4936-gif.github.io/badacamnak/
+- Secret·Pages·Actions 설정 완료. 첫 실제 실행 성공(약 10분): 해안 캠핑장 408곳(서해 184·남해 132·동해 78·제주 14), 반려견 가능 143곳, 15km 안 낚시 포인트 163곳.
+- 첫 실행 후 수정: 저녁 실행 때 낮이 지나간 '오늘' 제외, 대상어에서 '기타어종' 제외.
+- git: `C:\Program Files\Git\cmd\git.exe` (Claude 셸 PATH에 없음). 자격증명 저장돼 push 가능.
 
 ## 다음 할 일
-1. git 설치 후 `git init -b main`, 첫 커밋, 사용자 GitHub 저장소(`아이디/badacamnak`, Public, 빈 저장소)로 push.
-2. README 순서대로 Secret 등록 → Pages(main, /docs) 켜기 → Actions에서 Run workflow.
-3. 첫 실행 `samples/*.json` 으로 필드명 검증, 해안 필터·반려동물 판정·권역 분류(전남 서해/남해 구분 등) 검수.
+1. 권역 분류 검수(전남 서해/남해 경계, 부산·울산 등), 반려견 표기 빈 값 37곳 처리 방식.
+2. 공개 범위(전국 vs 남해안 먼저) 결정, 광고·수익화 및 겸직허가.
