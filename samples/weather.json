@@ -1,0 +1,48 @@
+{
+ "response": {
+  "header": {
+   "resultCode": "00",
+   "resultMsg": "NORMAL_SERVICE"
+  },
+  "body": {
+   "dataType": "JSON",
+   "items": {
+    "item": [
+     {
+      "baseDate": "20261007",
+      "baseTime": "2000",
+      "category": "TMP",
+      "fcstDate": "20261007",
+      "fcstTime": "2100",
+      "fcstValue": "19",
+      "nx": 89,
+      "ny": 73
+     },
+     {
+      "baseDate": "20261007",
+      "baseTime": "2000",
+      "category": "UUU",
+      "fcstDate": "20261007",
+      "fcstTime": "2100",
+      "fcstValue": "-0.7",
+      "nx": 89,
+      "ny": 73
+     },
+     {
+      "baseDate": "20261007",
+      "baseTime": "2000",
+      "category": "VVV",
+      "fcstDate": "20261007",
+      "fcstTime": "2100",
+      "fcstValue": "0",
+      "nx": 89,
+      "ny": 73
+     }
+    ]
+   },
+   "pageNo": 1,
+   "numOfRows": 2000,
+   "totalCount": 1016
+  }
+ }
+}

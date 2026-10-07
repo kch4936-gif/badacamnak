@@ -1,0 +1,98 @@
+{
+ "response": {
+  "header": {
+   "resultCode": "0000",
+   "resultMsg": "OK"
+  },
+  "body": {
+   "items": {
+    "item": [
+     {
+      "addr1": "서울특별시 마포구 양화로 188 (동교동)",
+      "addr2": "",
+      "areacode": "",
+      "cat1": "",
+      "cat2": "",
+      "cat3": "",
+      "contentid": "2900483",
+      "contenttypeid": "38",
+      "createdtime": "20221107161700",
+      "firstimage": "https://tong.visitkorea.or.kr/cms/resource/77/3573277_image2_1.jpg",
+      "firstimage2": "https://tong.visitkorea.or.kr/cms/resource/77/3573277_image3_1.jpg",
+      "cpyrhtDivCd": "Type1",
+      "mapx": "126.9264983504",
+      "mapy": "37.5577458297",
+      "mlevel": "6",
+      "modifiedtime": "20261006145115",
+      "sigungucode": "",
+      "tel": "",
+      "title": "AK PLAZA 홍대",
+      "zipcode": "04051",
+      "lDongRegnCd": "11",
+      "lDongSignguCd": "440",
+      "lclsSystm1": "SH",
+      "lclsSystm2": "SH02",
+      "lclsSystm3": "SH020100"
+     },
+     {
+      "addr1": "제주특별자치도 서귀포시 성산읍 섭지코지로 262",
+      "addr2": "",
+      "areacode": "",
+      "cat1": "",
+      "cat2": "",
+      "cat3": "",
+      "contentid": "127813",
+      "contenttypeid": "12",
+      "createdtime": "20030827090000",
+      "firstimage": "https://tong.visitkorea.or.kr/cms/resource/60/4109160_image2_1.JPG",
+      "firstimage2": "https://tong.visitkorea.or.kr/cms/resource/60/4109160_image3_1.JPG",
+      "cpyrhtDivCd": "Type1",
+      "mapx": "126.9297312423",
+      "mapy": "33.4236334564",
+      "mlevel": "6",
+      "modifiedtime": "20261005013001",
+      "sigungucode": "",
+      "tel": "",
+      "title": "섭지코지",
+      "zipcode": "63642",
+      "lDongRegnCd": "50",
+      "lDongSignguCd": "130",
+      "lclsSystm1": "NA",
+      "lclsSystm2": "NA02",
+      "lclsSystm3": "NA020800"
+     },
+     {
+      "addr1": "충청남도 보령시 해수욕장10길 79 (신흑동)",
+      "addr2": "",
+      "areacode": "",
+      "cat1": "",
+      "cat2": "",
+      "cat3": "",
+      "contentid": "2615569",
+      "contenttypeid": "28",
+      "createdtime": "20190817020802",
+      "firstimage": "https://tong.visitkorea.or.kr/cms/resource/35/2947535_image2_1.jpg",
+      "firstimage2": "https://tong.visitkorea.or.kr/cms/resource/35/2947535_image3_1.jpg",
+      "cpyrhtDivCd": "Type1",
+      "mapx": "126.5060901331",
+      "mapy": "36.3208378220",
+      "mlevel": "6",
+      "modifiedtime": "20261003013000",
+      "sigungucode": "",
+      "tel": "",
+      "title": "짚트랙코리아",
+      "zipcode": "33489",
+      "lDongRegnCd": "44",
+      "lDongSignguCd": "180",
+      "lclsSystm1": "LS",
+      "lclsSystm2": "LS01",
+      "lclsSystm3": "LS011900"
+     }
+    ]
+   },
+   "numOfRows": 1000,
+   "pageNo": 1,
+   "totalCount": 9672
+  }
+ }
+}

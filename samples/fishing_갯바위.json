@@ -1,0 +1,78 @@
+{
+ "response": {
+  "header": {
+   "resultCode": "00",
+   "resultMsg": "NORMAL_SERVICE"
+  },
+  "body": {
+   "items": {
+    "item": [
+     {
+      "seafsPstnNm": "가거도",
+      "lat": 34.07308,
+      "lot": 125.08805,
+      "predcYmd": "2026-10-07",
+      "predcNoonSeCd": "오전",
+      "seafsTgfshNm": "감성돔",
+      "tdlvHrCn": "중조기",
+      "minWvhgt": 0.3,
+      "maxWvhgt": 0.3,
+      "minWtem": 21.5,
+      "maxWtem": 21.6,
+      "minArtmp": 21.1,
+      "maxArtmp": 21.3,
+      "minCrsp": 0.2,
+      "maxCrsp": 0.2,
+      "minWspd": 1.9,
+      "maxWspd": 2.2,
+      "totalIndex": "매우좋음"
+     },
+     {
+      "seafsPstnNm": "가거도",
+      "lat": 34.07308,
+      "lot": 125.08805,
+      "predcYmd": "2026-10-07",
+      "predcNoonSeCd": "오전",
+      "seafsTgfshNm": "기타어종",
+      "tdlvHrCn": "중조기",
+      "minWvhgt": 0.3,
+      "maxWvhgt": 0.3,
+      "minWtem": 21.5,
+      "maxWtem": 21.6,
+      "minArtmp": 21.1,
+      "maxArtmp": 21.3,
+      "minCrsp": 0.2,
+      "maxCrsp": 0.2,
+      "minWspd": 1.9,
+      "maxWspd": 2.2,
+      "totalIndex": "매우좋음"
+     },
+     {
+      "seafsPstnNm": "가거도",
+      "lat": 34.07308,
+      "lot": 125.08805,
+      "predcYmd": "2026-10-07",
+      "predcNoonSeCd": "오전",
+      "seafsTgfshNm": "농어",
+      "tdlvHrCn": "중조기",
+      "minWvhgt": 0.3,
+      "maxWvhgt": 0.3,
+      "minWtem": 21.5,
+      "maxWtem": 21.6,
+      "minArtmp": 21.1,
+      "maxArtmp": 21.3,
+      "minCrsp": 0.2,
+      "maxCrsp": 0.2,
+      "minWspd": 1.9,
+      "maxWspd": 2.2,
+      "totalIndex": "매우좋음"
+     }
+    ]
+   },
+   "pageNo": 1,
+   "numOfRows": 300,
+   "totalCount": 1750,
+   "type": "json"
+  }
+ }
+}
