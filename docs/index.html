@@ -187,6 +187,8 @@ function scoreOf(s){
   return{weather:d.weather,fish:d.fishScore,conv,total:d.weather+d.fishScore+conv};
 }
 const visible=s=>(!state.petOnly||s.pet!=="none")&&s.days[state.day];
+const zonesOf=s=>s.zones||[s.zone];
+const inZone=(s,z)=>z==="전체"||zonesOf(s).includes(z);
 const petTag=s=>s.pet==="all"?'<span class="tag pet">반려견 동반</span>':s.pet==="small"?'<span class="tag pet">소형견만</span>':'<span class="tag nopet">반려견 불가</span>';
 const bar=(label,v,max)=>v==null
   ?`<div class="bar na"><div class="t"><span>${label}</span><b>미제공</b></div><div class="track"></div></div>`
@@ -197,13 +199,13 @@ const cell=(k,v)=>v==null||v===""?"":`<div class="cell"><span>${k}</span><b>${es
 function renderFilters(){
   document.getElementById("dates").innerHTML='<span class="lbl">날짜</span>'+DATA.dates.map((d,i)=>
     `<button class="chip" id="d-${i}" data-day="${d.key}" aria-pressed="${state.day===d.key}">${d.weekend?'<span class="we" aria-label="주말"></span>':''}${d.label}</button>`).join("");
-  const count=z=>DATA.sites.filter(s=>visible(s)&&(z==="전체"||s.zone===z)).length;
+  const count=z=>DATA.sites.filter(s=>visible(s)&&inZone(s,z)).length;
   document.getElementById("zones").innerHTML='<span class="lbl">권역</span>'+["전체",...ZONES].map((z,i)=>
     `<button class="chip" id="z-${i}" data-zone="${z}" aria-pressed="${state.zone===z}">${z}<span class="c">${count(z)}</span></button>`).join("");
   const row=document.getElementById("cities");
   if(state.zone==="전체"){row.hidden=true;row.innerHTML="";}
   else{
-    const cities=[...new Set(DATA.sites.filter(s=>s.zone===state.zone&&visible(s)).map(s=>s.city))].sort();
+    const cities=[...new Set(DATA.sites.filter(s=>inZone(s,state.zone)&&visible(s)).map(s=>s.city))].sort();
     row.hidden=false;
     row.innerHTML=["전체",...cities].map((c,i)=>`<button class="chip sm" id="c-${i}" data-city="${esc(c)}" aria-pressed="${state.city===c}">${c==="전체"?state.zone+" 전체":esc(c)}</button>`).join("");
   }
@@ -220,7 +222,7 @@ function detailHtml(s,d){
   const near=s.near&&s.near.length
     ?`<ul class="near">${s.near.map(n=>`<li><span><span class="k">${esc(n[0])}</span>${esc(n[1])}</span><span class="d">${n[2]}km</span></li>`).join("")}</ul>`
     :`<p class="p">10km 안에 등록된 반려동물 동반 장소가 없어요.</p>`;
-  const petNote=s.petRaw?` · 캠핑장 표기: ${esc(s.petRaw)}`:"";
+  const petNote=s.petRaw?` · 캠핑장 표기: ${esc(s.petRaw)}`:" · 캠핑장 표기 없음(동반 불가로 분류)";
   return `
     <div><h3>바다·날씨</h3><div class="cells">
       ${cell("강수확률",d.rain+" %")}${cell("최대 풍속",d.wind+" m/s")}${d.wave!=null?cell("파고",d.wave.toFixed(1)+" m"):""}
@@ -233,7 +235,7 @@ function detailHtml(s,d){
 
 function render(){
   renderFilters();
-  const rows=DATA.sites.filter(s=>visible(s)&&(state.zone==="전체"||s.zone===state.zone)&&(state.city==="전체"||s.city===state.city))
+  const rows=DATA.sites.filter(s=>visible(s)&&inZone(s,state.zone)&&(state.city==="전체"||s.city===state.city))
     .map(s=>({s,sc:scoreOf(s)})).sort((a,b)=>b.sc.total-a.sc.total);
   const dl=DATA.dates.find(d=>d.key===state.day);
   const where=state.zone==="전체"?"전국 해안":state.city==="전체"?state.zone+" 권역":state.zone+" · "+state.city;
@@ -248,7 +250,7 @@ function render(){
       <button class="head" id="h-${s.id}" data-id="${s.id}" aria-expanded="${open}" aria-controls="x-${s.id}">
         <span class="rank">${String(i+1).padStart(2,"0")}</span>
         <span class="info"><span class="name">${esc(s.name)}</span>
-          <span class="meta"><span class="tag zone">${s.zone}</span><span class="tag">${esc(s.area)}</span>${petTag(s)}${d.fishName?`<span class="tag fish">${esc(d.fishName)}</span>`:""}</span></span>
+          <span class="meta"><span class="tag zone">${zonesOf(s).join("·")}</span><span class="tag">${esc(s.area)}</span>${petTag(s)}${d.fishName?`<span class="tag fish">${esc(d.fishName)}</span>`:""}</span></span>
         <span class="score ${tone(sc.total)}"><span class="n">${sc.total}</span><span class="of">/ 100점</span></span>
       </button>
       <div class="bars">${bar("날씨",sc.weather,40)}${bar("낚시지수",sc.fish,40)}${bar(state.petOnly?"반려견":"편의시설",sc.conv,20)}</div>

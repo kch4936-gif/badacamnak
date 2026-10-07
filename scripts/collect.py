@@ -43,6 +43,8 @@ FISH_LEVEL = {"매우좋음": 5, "좋음": 4, "보통": 3, "나쁨": 2, "매우�
 
 # 전남은 서해안·남해안이 섞여 있어 시군 단위로 나눈다
 JEONNAM_WEST = ("영광", "함평", "무안", "목포", "신안")
+# 서해·남해 경계(땅끝·진도 일대)는 두 권역 모두에 보여 준다
+JEONNAM_BOTH = ("해남", "진도", "영암")
 
 
 GATEWAY_ERRORS = ("SERVICE_KEY_IS_NOT_REGISTERED_ERROR", "SERVICE_ACCESS_DENIED_ERROR",
@@ -195,6 +197,13 @@ def zone_of(do, sigungu):
     return "서해"  # 인천·경기·충남·전북
 
 
+def zones_of(do, sigungu):
+    """권역 목록. 경계 지역은 [서해, 남해] 두 개."""
+    if ("전남" in (do or "") or "전라남" in (do or "")) and any(k in (sigungu or "") for k in JEONNAM_BOTH):
+        return ["서해", "남해"]
+    return [zone_of(do, sigungu)]
+
+
 SHORT_DO = {"경기": "경기", "인천": "인천", "충청남": "충남", "충남": "충남", "전북": "전북", "전라북": "전북",
             "전라남": "전남", "전남": "전남", "경상남": "경남", "경남": "경남", "경상북": "경북", "경북": "경북",
             "강원": "강원", "부산": "부산", "울산": "울산", "제주": "제주", "서울": "서울", "충청북": "충북", "충북": "충북"}
@@ -238,6 +247,7 @@ def fetch_camps():
             "id": str(it.get("contentId")),
             "name": it.get("facltNm", "").strip(),
             "zone": zone_of(it.get("doNm"), it.get("sigunguNm")),
+            "zones": zones_of(it.get("doNm"), it.get("sigunguNm")),
             "city": (it.get("sigunguNm") or "").strip(),
             "area": f"{short_do(it.get('doNm'))} {it.get('sigunguNm') or ''}".strip(),
             "addr": it.get("addr1", ""),
@@ -474,7 +484,7 @@ def build(camps, grids, now):
     wd = "월화수목금토일"
     date_meta = [{"key": d, "label": f"{wd[datetime.strptime(d, '%Y%m%d').weekday()]} {int(d[4:6])}/{int(d[6:])}",
                   "weekend": datetime.strptime(d, "%Y%m%d").weekday() >= 5} for d in dates]
-    zones = Counter(s["zone"] for s in out_sites)
+    zones = Counter(z for s in out_sites for z in s["zones"])
     print("권역별:", dict(zones))
     return {
         "updated": now.strftime("%Y-%m-%d %H:%M"),
