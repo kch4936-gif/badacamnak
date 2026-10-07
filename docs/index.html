@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>주말 바다캠낚</title>
+<meta name="description" content="전국 해안 캠핑장을 날씨·바다낚시지수·반려견 동반 조건으로 점수 매겨 보여줍니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 물때표처럼 촘촘한 한 줄 목록. 권역 → 시군 2단 필터, 카드를 누르면 그 자리에서 상세가 펼쳐진다. */
+:root{
+  --bg:#ECF1F0;--surface:#F8FAF9;--ink:#12303A;--muted:#5A7078;--line:#CBD8D7;
+  --accent:#D9582A;--accent-soft:#F6DED3;
+  --good:#2C8A66;--ok:#B8901B;--bad:#B4483C;
+  --good-soft:#DCEFE6;--ok-soft:#F3EACB;--bad-soft:#F3DCD8;
+  --f-display:"Do Hyeon","IBM Plex Sans KR",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0D1C21;--surface:#132A31;--ink:#E3EEEC;--muted:#93ABB0;--line:#24434B;
+  --accent:#F07A48;--accent-soft:#3A2419;--good:#5FC69A;--ok:#E2BE4E;--bad:#E9786A;
+  --good-soft:#173A2E;--ok-soft:#3A3217;--bad-soft:#3E1F1B;color-scheme:dark}}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;padding-top:env(safe-area-inset-top,0px);word-break:keep-all;overflow-wrap:break-word}
+[hidden]{display:none!important}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:grid;gap:22px}
+button{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header{display:grid;gap:6px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(30px,6vw,40px);line-height:1.1;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{color:var(--muted);margin:0;max-width:60ch}
+.badge{justify-self:start;font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--accent);background:var(--accent-soft);padding:3px 9px;border-radius:999px}
+.updated{font-size:12.5px;color:var(--muted);font-family:var(--f-mono)}
+
+.controls{display:grid;gap:12px;padding-block:14px;border-block:1px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--muted);min-width:44px}
+.chip{border:1px solid var(--line);background:var(--surface);padding:6px 13px;border-radius:999px;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .c{font-family:var(--f-mono);font-size:11.5px;opacity:.7}
+.chip .we{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.chip.sm{padding:4px 11px;font-size:13px}
+.sub-row{padding-left:52px}
+@media (max-width:520px){.sub-row{padding-left:0}}
+.toggle{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-weight:500}
+.toggle input{position:absolute;opacity:0;width:1px;height:1px}
+.sw{width:42px;height:24px;border-radius:999px;background:var(--line);position:relative;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--surface);transition:transform .2s}
+.toggle input:checked + .sw{background:var(--accent)}
+.toggle input:checked + .sw::after{transform:translateX(18px)}
+.toggle input:focus-visible + .sw{outline:2px solid var(--accent);outline-offset:2px}
+
+.summary{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.summary b{color:var(--ink)}
+.howto{background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0;font-size:13px}
+.formula{font-size:13px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:4px}
+.formula p{margin:0}
+
+ol.list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.card.open{border-color:var(--ink)}
+.head{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:14px 16px;background:none;border:none;text-align:left;cursor:pointer}
+.rank{font-family:var(--f-mono);font-size:13px;color:var(--muted);width:26px}
+.info{min-width:0;display:grid;gap:4px}
+.name{font-weight:600;font-size:16px;line-height:1.3;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px}
+.tag{padding:2px 8px;border-radius:6px;background:var(--bg);color:var(--muted)}
+.tag.zone{background:transparent;border:1px solid var(--line)}
+.tag.pet{background:var(--good-soft);color:var(--good)}
+.tag.nopet{background:var(--bad-soft);color:var(--bad)}
+.tag.fish{background:var(--accent-soft);color:var(--accent)}
+.score{text-align:right;display:grid;justify-items:end;gap:2px}
+.score .n{font-family:var(--f-display);font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.score .of{font-size:11px;color:var(--muted);letter-spacing:.05em}
+.score.g .n{color:var(--good)}.score.o .n{color:var(--ok)}.score.b .n{color:var(--bad)}
+
+.bars{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 16px 14px}
+.bar{display:grid;gap:4px;font-size:12px;color:var(--muted)}
+.bar .t{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.bar .t b{color:var(--ink);font-weight:500}
+.track{height:6px;border-radius:3px;background:var(--bg);overflow:hidden}
+.fill{height:100%;border-radius:3px;background:var(--ink)}
+.bar.na .track{background:repeating-linear-gradient(90deg,var(--line) 0 4px,transparent 4px 8px)}
+
+.detail{border-top:1px dashed var(--line);padding:16px;display:grid;gap:18px}
+.detail h3{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--muted);margin:0 0 8px}
+.cells{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cell{background:var(--bg);border-radius:8px;padding:8px 10px;display:grid;gap:2px}
+.cell span{font-size:11.5px;color:var(--muted)}
+.cell b{font-family:var(--f-mono);font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.slot{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;display:grid;gap:2px}
+.slot .when{font-weight:600}
+.slot .v{font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
+.idx{display:inline-block;font-weight:600;padding:1px 8px;border-radius:5px;font-size:12.5px}
+.idx.l5,.idx.l4{background:var(--good-soft);color:var(--good)}
+.idx.l3{background:var(--ok-soft);color:var(--ok)}
+.idx.l2,.idx.l1{background:var(--bad-soft);color:var(--bad)}
+.p{font-size:14px;margin:0}
+.p .d{font-family:var(--f-mono);color:var(--muted);font-size:13px}
+ul.near{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+ul.near li{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+ul.near li:last-child{border-bottom:none}
+ul.near .k{font-size:12px;color:var(--muted);margin-right:6px}
+ul.near .d{font-family:var(--f-mono);color:var(--muted);font-size:13px;white-space:nowrap}
+.links{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cta{border:1px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:8px;padding:8px 14px;font-size:13.5px;font-weight:500;cursor:pointer;text-decoration:none}
+.tel{font-family:var(--f-mono);font-size:13px;color:var(--muted);user-select:all}
+.more{justify-self:center;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 18px;cursor:pointer}
+
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:24px;text-align:center;color:var(--muted)}
+footer{font-size:12.5px;color:var(--muted);display:grid;gap:4px;border-top:1px solid var(--line);padding-top:16px}
+footer b{color:var(--ink);font-weight:500}
+
+@media (max-width:520px){
+  .bars{grid-template-columns:1fr}
+  .cells{grid-template-columns:repeat(2,1fr)}
+  .slots{grid-template-columns:1fr}
+  .head{gap:10px;padding:12px 14px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="badge" id="demo-badge" hidden>예시 데이터 · 실제 API 연결 전</span>
+    <h1>이번 주말, <em>어느 바다</em>로 캠낚 갈까</h1>
+    <p class="sub">전국 해안 캠핑장을 날씨·바다낚시지수·반려견 동반 조건으로 점수 매겨 순서대로 보여줍니다.</p>
+    <span class="updated" id="updated"></span>
+  </header>
+
+  <section class="controls" aria-label="조건">
+    <div class="row" role="group" aria-label="날짜" id="dates"></div>
+    <div class="row" role="group" aria-label="권역" id="zones"></div>
+    <div class="row sub-row" role="group" aria-label="시군" id="cities" hidden></div>
+    <div class="row">
+      <span class="lbl">반려견</span>
+      <label class="toggle" for="pet-only"><input type="checkbox" id="pet-only" checked><span class="sw" aria-hidden="true"></span>동반 가능한 곳만 보기</label>
+    </div>
+  </section>
+
+  <div class="summary">
+    <span id="summary">데이터를 불러오는 중…</span>
+    <button class="howto" id="howto-btn" aria-expanded="false" aria-controls="formula">점수 계산 방식</button>
+  </div>
+  <div class="formula" id="formula" hidden>
+    <p><b>날씨 40점</b> 낮 시간(06~21시) 최고 강수확률과 최대 풍속(4m/s 초과분)을 감점해 계산합니다.</p>
+    <p><b>낚시 40점</b> 15km 안 가장 가까운 포인트의 바다낚시지수 5단계(매우좋음 40 · 좋음 32 · 보통 24 · 나쁨 14 · 매우나쁨 6).</p>
+    <p><b>편의 20점</b> 반려견 전 견종 가능 20 · 소형견만 14 · 불가 8. 반려견 필터를 끄면 부대시설 수 기준으로 바뀝니다.</p>
+    <p>낚시지수가 없는 곳은 날씨와 편의 60점을 100점으로 환산합니다.</p>
+  </div>
+
+  <ol class="list" id="list"></ol>
+  <button class="more" id="more" hidden>더 보기</button>
+
+  <footer>
+    <span>데이터 출처 · <b>한국관광공사 고캠핑</b> · <b>한국관광공사 반려동물 동반여행</b> · <b>국립해양조사원 바다낚시지수</b> · <b>기상청 단기예보</b> (공공데이터포털)</span>
+    <span>예보와 지수는 참고용입니다. 출발 전 현지 기상과 캠핑장 운영 여부, 반려동물 조건을 꼭 확인하세요.</span>
+  </footer>
+</div>
+
+<script>
+const ZONES=["서해","남해","동해","제주"];
+const LV={"매우좋음":5,"좋음":4,"보통":3,"나쁨":2,"매우나쁨":1};
+const PAGE=30;
+let DATA=null;
+const state={day:null,zone:"전체",city:"전체",petOnly:true,open:null,limit:PAGE};
+
+function load(){try{const s=JSON.parse(localStorage.getItem("camnak")||"{}");
+  if(s.zone)state.zone=s.zone;if(typeof s.petOnly==="boolean")state.petOnly=s.petOnly;}catch(e){}}
+function save(){try{localStorage.setItem("camnak",JSON.stringify({zone:state.zone,city:state.city,petOnly:state.petOnly}))}catch(e){}}
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function scoreOf(s){
+  const d=s.days[state.day];
+  const conv=state.petOnly?({all:20,small:14,none:8}[s.pet]):s.fac;
+  if(d.fishScore==null)return{weather:d.weather,fish:null,conv,total:Math.round((d.weather+conv)/60*100)};
+  return{weather:d.weather,fish:d.fishScore,conv,total:d.weather+d.fishScore+conv};
+}
+const visible=s=>(!state.petOnly||s.pet!=="none")&&s.days[state.day];
+const petTag=s=>s.pet==="all"?'<span class="tag pet">반려견 동반</span>':s.pet==="small"?'<span class="tag pet">소형견만</span>':'<span class="tag nopet">반려견 불가</span>';
+const bar=(label,v,max)=>v==null
+  ?`<div class="bar na"><div class="t"><span>${label}</span><b>미제공</b></div><div class="track"></div></div>`
+  :`<div class="bar"><div class="t"><span>${label}</span><b>${v}/${max}</b></div><div class="track"><div class="fill" style="width:${v/max*100}%"></div></div></div>`;
+const tone=t=>t>=75?"g":t>=55?"o":"b";
+const cell=(k,v)=>v==null||v===""?"":`<div class="cell"><span>${k}</span><b>${esc(v)}</b></div>`;
+
+function renderFilters(){
+  document.getElementById("dates").innerHTML='<span class="lbl">날짜</span>'+DATA.dates.map((d,i)=>
+    `<button class="chip" id="d-${i}" data-day="${d.key}" aria-pressed="${state.day===d.key}">${d.weekend?'<span class="we" aria-label="주말"></span>':''}${d.label}</button>`).join("");
+  const count=z=>DATA.sites.filter(s=>visible(s)&&(z==="전체"||s.zone===z)).length;
+  document.getElementById("zones").innerHTML='<span class="lbl">권역</span>'+["전체",...ZONES].map((z,i)=>
+    `<button class="chip" id="z-${i}" data-zone="${z}" aria-pressed="${state.zone===z}">${z}<span class="c">${count(z)}</span></button>`).join("");
+  const row=document.getElementById("cities");
+  if(state.zone==="전체"){row.hidden=true;row.innerHTML="";}
+  else{
+    const cities=[...new Set(DATA.sites.filter(s=>s.zone===state.zone&&visible(s)).map(s=>s.city))].sort();
+    row.hidden=false;
+    row.innerHTML=["전체",...cities].map((c,i)=>`<button class="chip sm" id="c-${i}" data-city="${esc(c)}" aria-pressed="${state.city===c}">${c==="전체"?state.zone+" 전체":esc(c)}</button>`).join("");
+  }
+  document.getElementById("pet-only").checked=state.petOnly;
+}
+
+function detailHtml(s,d){
+  const f=d.fishScore!=null;
+  let pointHtml;
+  if(f)pointHtml=`<p class="p">${esc(s.point.name)} <span class="d">${s.point.km}km</span>${d.fishName?` · 대상어 ${esc(d.fishName)}`:""} · 낚시지수 <span class="idx l${LV[d.idx]||3}">${esc(d.idx)}</span></p>`;
+  else if(s.point&&s.point.name)pointHtml=`<p class="p">${esc(s.point.name)} <span class="d">${s.point.km}km</span> · 이 날짜의 낚시지수가 아직 없어요.</p>`;
+  else if(s.point)pointHtml=`<p class="p">반경 15km 안에 낚시지수 제공 포인트가 없어요 <span class="d">(가장 가까운 곳 ${s.point.km}km)</span>.</p>`;
+  else pointHtml=`<p class="p">낚시지수는 곧 연결됩니다. 지금은 날씨와 편의 점수로만 순위를 매겼어요.</p>`;
+  const near=s.near&&s.near.length
+    ?`<ul class="near">${s.near.map(n=>`<li><span><span class="k">${esc(n[0])}</span>${esc(n[1])}</span><span class="d">${n[2]}km</span></li>`).join("")}</ul>`
+    :`<p class="p">10km 안에 등록된 반려동물 동반 장소가 없어요.</p>`;
+  const petNote=s.petRaw?` · 캠핑장 표기: ${esc(s.petRaw)}`:"";
+  return `
+    <div><h3>바다·날씨</h3><div class="cells">
+      ${cell("강수확률",d.rain+" %")}${cell("최대 풍속",d.wind+" m/s")}${d.wave!=null?cell("파고",d.wave.toFixed(1)+" m"):""}
+      ${d.tmax!=null?cell("기온",`${d.tmin}~${d.tmax} ℃`):""}${d.sea!=null?cell("수온",d.sea+" ℃"):""}${d.tide?cell("물때",d.tide):""}</div></div>
+    <div><h3>시간대별 날씨</h3><div class="slots">${d.slots.map(x=>`<div class="slot"><span class="when">${x[0]}</span><span>${esc(x[1])}</span><span class="v">${esc(x[2])}</span></div>`).join("")}</div></div>
+    <div><h3>가까운 낚시 포인트</h3>${pointHtml}</div>
+    <div><h3>주변 반려동물 동반 장소${petNote}</h3>${near}</div>
+    <div class="links">${s.link?`<a class="cta" href="${esc(s.link)}" target="_blank" rel="noopener">예약·홈페이지</a>`:""}${s.tel?`<span class="tel">${esc(s.tel)}</span>`:""}<span class="p" style="color:var(--muted);font-size:13px">${esc(s.addr)}</span></div>`;
+}
+
+function render(){
+  renderFilters();
+  const rows=DATA.sites.filter(s=>visible(s)&&(state.zone==="전체"||s.zone===state.zone)&&(state.city==="전체"||s.city===state.city))
+    .map(s=>({s,sc:scoreOf(s)})).sort((a,b)=>b.sc.total-a.sc.total);
+  const dl=DATA.dates.find(d=>d.key===state.day);
+  const where=state.zone==="전체"?"전국 해안":state.city==="전체"?state.zone+" 권역":state.zone+" · "+state.city;
+  document.getElementById("summary").innerHTML=`<b>${dl?dl.label:""}</b> · ${where} · ${rows.length}곳`;
+
+  const list=document.getElementById("list");
+  const more=document.getElementById("more");
+  if(!rows.length){list.innerHTML='<li class="empty">조건에 맞는 캠핑장이 없어요. 권역을 넓히거나 반려견 필터를 꺼 보세요.</li>';more.hidden=true;return;}
+  list.innerHTML=rows.slice(0,state.limit).map(({s,sc},i)=>{
+    const d=s.days[state.day];const open=state.open===s.id;
+    return `<li class="card${open?" open":""}">
+      <button class="head" id="h-${s.id}" data-id="${s.id}" aria-expanded="${open}" aria-controls="x-${s.id}">
+        <span class="rank">${String(i+1).padStart(2,"0")}</span>
+        <span class="info"><span class="name">${esc(s.name)}</span>
+          <span class="meta"><span class="tag zone">${s.zone}</span><span class="tag">${esc(s.area)}</span>${petTag(s)}${d.fishName?`<span class="tag fish">${esc(d.fishName)}</span>`:""}</span></span>
+        <span class="score ${tone(sc.total)}"><span class="n">${sc.total}</span><span class="of">/ 100점</span></span>
+      </button>
+      <div class="bars">${bar("날씨",sc.weather,40)}${bar("낚시지수",sc.fish,40)}${bar(state.petOnly?"반려견":"편의시설",sc.conv,20)}</div>
+      <div class="detail" id="x-${s.id}" ${open?"":"hidden"}>${open?detailHtml(s,d):""}</div></li>`;}).join("");
+  more.hidden=rows.length<=state.limit;
+  more.textContent=`더 보기 (${rows.length-state.limit}곳 남음)`;
+}
+
+document.addEventListener("click",e=>{
+  const day=e.target.closest("[data-day]");if(day){state.day=day.dataset.day;render();return;}
+  const z=e.target.closest("[data-zone]");if(z){state.zone=z.dataset.zone;state.city="전체";state.open=null;state.limit=PAGE;save();render();return;}
+  const c=e.target.closest("[data-city]");if(c){state.city=c.dataset.city;state.open=null;state.limit=PAGE;save();render();return;}
+  const h=e.target.closest(".head");if(h){state.open=state.open===h.dataset.id?null:h.dataset.id;render();document.getElementById("h-"+h.dataset.id)?.focus();return;}
+});
+document.getElementById("more").addEventListener("click",()=>{state.limit+=PAGE;render();});
+document.getElementById("pet-only").addEventListener("change",e=>{state.petOnly=e.target.checked;save();render();});
+document.getElementById("howto-btn").addEventListener("click",e=>{const f=document.getElementById("formula");f.hidden=!f.hidden;e.currentTarget.setAttribute("aria-expanded",String(!f.hidden));});
+
+load();
+fetch("data/sites.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();}).then(d=>{
+  DATA=d;
+  document.getElementById("demo-badge").hidden=!d.demo;
+  document.getElementById("updated").textContent=`${d.updated} 기준 예보`;
+  const we=d.dates.find(x=>x.weekend);
+  state.day=(we||d.dates[0]).key;
+  if(!ZONES.includes(state.zone))state.zone="전체";
+  render();
+}).catch(()=>{document.getElementById("summary").textContent="데이터를 불러오지 못했어요. 잠시 후 새로고침해 주세요.";});
+</script>
+</body>
+</html>
